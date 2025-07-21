@@ -114,9 +114,11 @@ public class register_page {
             }
             else if(request.equals("registration successful")){
                 dashboard dash = new dashboard();
-                Scene dashscene = new Scene(dash.getlayout(username.getText(),window),1000,1000);
+                Scene dashscene = new Scene(dash.getlayout(username.getText(),window));
                 dashscene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
                 window.setScene(dashscene);
+                window.setFullScreen(true);
+                window.setFullScreenExitHint("");
             }
             else if (request.equals("user already exists")){
                 errormessage1.setVisible(true);

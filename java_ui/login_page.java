@@ -10,13 +10,19 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
+import java.io.*;
+
 public class login_page extends Application {
     Stage window;
 
     @Override
     public void start(Stage primaryStage) {
+        startBackend();
         window = primaryStage;
-        window.setTitle("Tradesight Login");
+        window.setTitle("Tradesight");
+        Image icon = new Image(getClass().getResource("/tradesight_icon.png").toExternalForm());
+        window.getIcons().add(icon);
+
 
         // Load image
         Image logo = new Image(getClass().getResourceAsStream("/tradesight.png"));
@@ -45,7 +51,7 @@ public class login_page extends Application {
         password1.setManaged(false);
         password1.getStyleClass().add("password-btn");
 
-        Button visible1 = new  Button("👁");
+        Button visible1 = new Button("👁");
         visible1.setPrefHeight(45);
         visible1.setOnAction(e -> {
             password.setVisible(false);
@@ -66,9 +72,12 @@ public class login_page extends Application {
             String request = login_verification.loginUser(username.getText(), password1.getText());
             if (request.equals("Login successful")) {
                 dashboard dash = new dashboard();
-                Scene dashscene = new Scene(dash.getlayout(username.getText(), window), 1000, 1000);
+                Scene dashscene = new Scene(dash.getlayout(username.getText(), window));
                 dashscene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+
                 window.setScene(dashscene);
+                window.setFullScreenExitHint("");
+                window.setFullScreen(true); // ✅ Moved after setting the scene to avoid flicker
             } else if (request.equals("Invalid credentials")) {
                 errormessage.setVisible(true);
                 username.clear();
@@ -84,9 +93,12 @@ public class login_page extends Application {
 
         registerButton.setOnAction(e -> {
             register_page regPage = new register_page();
-            Scene registerScene = new Scene(regPage.getLayout(window), 1000, 1000);
+            Scene registerScene = new Scene(regPage.getLayout(window));
             registerScene.getStylesheets().add(getClass().getResource("/register.css").toExternalForm());
+
             window.setScene(registerScene);
+            window.setFullScreenExitHint("");
+            window.setFullScreen(true); // ✅ Moved after setting the scene
         });
 
         HBox hbox = new HBox(10, newLabel, registerButton);
@@ -97,7 +109,7 @@ public class login_page extends Application {
         layout.setAlignment(Pos.TOP_CENTER);
         layout.setPadding(new Insets(30));
 
-        // ✅ Add background image here
+        // Background image
         Image backgroundImg = new Image(getClass().getResource("/background.jpg").toExternalForm());
         BackgroundImage bgImage = new BackgroundImage(
                 backgroundImg,
@@ -109,11 +121,64 @@ public class login_page extends Application {
         layout.setBackground(new Background(bgImage));
 
         // Scene
-        Scene scene = new Scene(layout, 1000, 1000);
+        Scene scene = new Scene(layout);
         scene.getStylesheets().add(getClass().getResource("/login.css").toExternalForm());
+
+
         window.setScene(scene);
+        window.setFullScreenExitHint("");
+        window.setFullScreen(true); // ✅ Moved after setting the scene
         window.show();
+
+        window.fullScreenProperty().addListener((obs, wasFullScreen, isNowFullScreen) -> {
+            if (!isNowFullScreen) {
+                // User exited fullscreen — lock to a fixed size
+                window.setWidth(1280);
+                window.setHeight(800);
+                window.setResizable(false); // optional: prevent resizing
+                window.centerOnScreen();    // optional: center the window
+            }
+        });
     }
+    private void startBackend() {
+        try {
+            // ✅ Point to your Python script
+            ProcessBuilder pb = new ProcessBuilder("python", "../backend/app.py");
+
+            // ✅ Merge stderr into stdout so you catch all logs
+            pb.redirectErrorStream(true);
+
+            // ✅ Start the backend process
+            Process process = pb.start();
+
+            // ✅ Thread to capture backend logs and show in Java console
+            new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()));
+                     BufferedWriter logWriter = new BufferedWriter(
+                             new FileWriter("flask_debug.log", true)) // Append mode
+                ) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println("[Flask] " + line);
+                        logWriter.write(line);
+                        logWriter.newLine();
+                        logWriter.flush(); // Flush to ensure real-time logging
+                    }
+                } catch (IOException e) {
+                    System.err.println("❌ Error reading Flask backend output:");
+                    e.printStackTrace();
+                }
+            }).start();
+
+            System.out.println("✅ Flask backend started.");
+
+        } catch (IOException e) {
+            System.err.println("❌ Could not start Flask backend.");
+            e.printStackTrace();
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);

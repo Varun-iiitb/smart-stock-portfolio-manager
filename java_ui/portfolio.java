@@ -188,23 +188,29 @@ public class portfolio {
 
         research.setOnAction(event -> {
             research res = new research();
-            Scene resscene = new Scene(res.getlayout(username,window),1000,1000);
+            Scene resscene = new Scene(res.getlayout(username,window));
             resscene.getStylesheets().add(getClass().getResource("/research.css").toExternalForm());
             window.setScene(resscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         analysis.setOnAction(event -> {
             analytics_graph analytics = new analytics_graph();
-            Scene analysisscene = new Scene(analytics.getlayout(username,window),1000,1000);
+            Scene analysisscene = new Scene(analytics.getlayout(username,window));
             analysisscene.getStylesheets().add(getClass().getResource("/analysiss.css").toExternalForm());
             window.setScene(analysisscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         dashboard.setOnAction(event -> {
             com.example.tradesight.dashboard dash = new  com.example.tradesight.dashboard();
-            Scene dashcene = new Scene(dash.getlayout(username,window),1000,1000);
+            Scene dashcene = new Scene(dash.getlayout(username,window));
             dashcene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
             window.setScene(dashcene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         return root1;

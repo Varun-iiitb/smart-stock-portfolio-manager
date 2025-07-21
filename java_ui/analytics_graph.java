@@ -151,13 +151,13 @@ public class analytics_graph {
         finalbox.setPadding(new Insets(20));
 
         WebView top = new WebView();
-        top.getEngine().load("file:///C:/Users/varun/OneDrive/Desktop/java_project/candlestick_chart.html");
+        top.getEngine().load("file:///C:/Users/varun/tradesight_app/backend/candlestick_chart.html");
 
         WebView bottom_left = new WebView();
-        bottom_left.getEngine().load("file:///C:/Users/varun/OneDrive/Desktop/java_project/profit_loss.html");
+        bottom_left.getEngine().load("file:///C:/Users/varun/tradesight_app/backend/profit_loss.html");
 
         WebView bottom_right = new WebView();
-        bottom_right.getEngine().load("file:///C:/Users/varun/OneDrive/Desktop/java_project/portfolio_value.html");
+        bottom_right.getEngine().load("file:///C:/Users/varun/tradesight_app/backend/portfolio_value.html");
 
         HBox hbox = new HBox(20, bottom_left, bottom_right);
 
@@ -172,23 +172,29 @@ public class analytics_graph {
 
         Portfolio.setOnAction(event -> {
             portfolio port = new portfolio();
-            Scene portscene = new Scene(port.getlayout(username, window),1000,1000);
+            Scene portscene = new Scene(port.getlayout(username, window));
             portscene.getStylesheets().add(getClass().getResource("/portfolio.css").toExternalForm());
             window.setScene(portscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         research.setOnAction(event -> {
             research res = new research();
-            Scene resscene = new Scene(res.getlayout(username, window), 1000, 1000);
+            Scene resscene = new Scene(res.getlayout(username, window));
             resscene.getStylesheets().add(getClass().getResource("/research.css").toExternalForm());
             window.setScene(resscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         dashboard.setOnAction(event -> {
             com.example.tradesight.dashboard dash = new  com.example.tradesight.dashboard();
-            Scene dashcene = new Scene(dash.getlayout(username,window),1000,1000);
+            Scene dashcene = new Scene(dash.getlayout(username,window));
             dashcene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
             window.setScene(dashcene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         return root;

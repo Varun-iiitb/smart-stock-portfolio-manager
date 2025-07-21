@@ -84,6 +84,7 @@ public class research {
 
         Button submit = new Button("Submit");
         searchsubmit.getChildren().addAll(Search,submit);
+        submit.getStyleClass().add("submit");
 
         finalBox.getChildren().add(searchsubmit);
 
@@ -308,7 +309,7 @@ public class research {
             webView.setPrefHeight(500);
             VBox.setVgrow(webView, Priority.ALWAYS);
             WebEngine webEngine = webView.getEngine();
-            webEngine.load("file:///C:/Users/varun/OneDrive/Desktop/java_project/live_stock_prices.html");
+            webEngine.load("file:///C:/Users/varun/tradesight_app/backend/live_stock_prices.html");
 
             Label Price = new  Label("Closing Price");
             Price.getStyleClass().add("stock-heading");
@@ -385,21 +386,32 @@ public class research {
             Label prediction = new Label("Prediction of coming month");
             prediction.getStyleClass().add("stock-heading");
             String ml_output = dashboard_request.ml_prediction(stockname);
-            TextArea output = new TextArea(ml_output);
-            output.setWrapText(true);
-            output.setEditable(false);
-            output.setPrefRowCount(4); // Or as needed
-            if (ml_output.contains("increasing")) {
-                output.setStyle("-fx-text-fill: green;");
-            }
-            else{
-                output.setStyle("-fx-text-fill: red;");
-            }
-            output.getStyleClass().add("text-box");
+
+            Label ml_label = new Label(ml_output);
+            ml_label.getStyleClass().add("prediction-label");
+
+            WebView webView2 = new WebView();
+            webView2.setPrefHeight(500);
+            WebEngine webEngine2 = webView2.getEngine();
+            webEngine2.load("file:///C:/Users/varun/tradesight_app/backend/prediction.html");
+
+
+
+//            TextArea output = new TextArea(ml_output);
+//            output.setWrapText(true);
+//            output.setEditable(false);
+//            output.setPrefRowCount(4); // Or as needed
+//            if (ml_output.contains("increasing")) {
+//                output.setStyle("-fx-text-fill: green;");
+//            }
+//            else{
+//                output.setStyle("-fx-text-fill: red;");
+//            }
+//            output.getStyleClass().add("text-box");
 
             VBox vbox1 = new VBox();
             vbox1.setSpacing(20);
-            vbox1.getChildren().addAll(prediction,output);
+            vbox1.getChildren().addAll(prediction,ml_label,webView2);
             finalBox.getChildren().addAll(top_half,center,vbox1);
 
 
@@ -412,23 +424,29 @@ public class research {
 
         analysis.setOnAction(event -> {
             analytics_graph analytics = new analytics_graph();
-        Scene analysisscene = new Scene(analytics.getlayout(username,window),1000,1000);
+        Scene analysisscene = new Scene(analytics.getlayout(username,window));
             analysisscene.getStylesheets().add(getClass().getResource("/analysiss.css").toExternalForm());
             window.setScene(analysisscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         Portfolio.setOnAction(event -> {
             portfolio port = new portfolio();
-            Scene portscene = new Scene(port.getlayout(username,window),1000,1000);
+            Scene portscene = new Scene(port.getlayout(username,window));
             portscene.getStylesheets().add(getClass().getResource("/portfolio.css").toExternalForm());
             window.setScene(portscene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
         dashboard.setOnAction(event -> {
             com.example.tradesight.dashboard dash = new  com.example.tradesight.dashboard();
-            Scene dashcene = new Scene(dash.getlayout(username,window),1000,1000);
+            Scene dashcene = new Scene(dash.getlayout(username,window));
             dashcene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
             window.setScene(dashcene);
+            window.setFullScreen(true);
+            window.setFullScreenExitHint("");
         });
 
 

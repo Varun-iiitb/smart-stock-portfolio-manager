@@ -5,16 +5,39 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
+import java.awt.*;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 
 
 public class dashboard_request {
+
+    public static void export_data(String username){
+        try{
+            String jsonbody = String.format("{\"username\":\"%s\"}", username);
+
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://localhost:5000/export")).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(jsonbody)).build();
+            HttpClient httpClient = HttpClient.newHttpClient();
+            HttpResponse<byte []> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            Path path = Paths.get(System.getProperty("user.home"), "Desktop", "report.xlsx");
+            Files.write(path, response.body());
+
+            // Open the file
+            Desktop.getDesktop().open(path.toFile());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<Object> add_Stock(String username, String stock_name, int quantity, double price, LocalDate date) {
         try {
             String jsonbody = String.format("{\"username\":\"%s\",\"stock_name\":\"%s\",\"quantity\":\"%d\",\"price_per_share\":\"%f\",\"date\":\"%s\"}",username,stock_name, quantity, price,date);
@@ -157,9 +180,7 @@ public class dashboard_request {
             HttpClient httpClient = HttpClient.newHttpClient();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            // Debug print to verify request
-            System.out.println("Status code: " + response.statusCode());
-            System.out.println("Response: " + response.body());
+
 
         } catch (Exception e) {
             e.printStackTrace(); // Always print the exception!
@@ -170,6 +191,7 @@ public class dashboard_request {
     public static void stockname_graph(String username, String stockName, String mode,
                                        LocalDate startDate, LocalDate endDate, String month, String year) {
         try {
+            System.out.println("success");
             Map<String, String> data = new HashMap<>();
             data.put("username", username);
             data.put("stock_name", stockName);
@@ -205,16 +227,33 @@ public class dashboard_request {
     public static String ml_prediction(String stock_name) {
         try {
             String jsonbody = String.format("{\"stock_name\":\"%s\"}", stock_name);
-            HttpRequest request = HttpRequest.newBuilder().uri(URI.create("http://localhost:5000/predict")).header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(jsonbody)).build();
-            HttpClient httpClient = HttpClient.newHttpClient();
 
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:5000/predict"))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonbody))
+                    .build();
+
+            HttpClient httpClient = HttpClient.newHttpClient();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
             String responseBody = response.body();
-            return responseBody;
+
+            // Parse the response using Gson
+            Gson gson = new Gson();
+            JsonObject jsonObject = gson.fromJson(responseBody, JsonObject.class);
+
+            String message1 = jsonObject.get("message1").getAsString();
+            String message2 = jsonObject.get("message2").getAsString();
+
+            return message1 + "\n" + message2;
 
         } catch (Exception e) {
-            return "";
+            e.printStackTrace();
+            return "Prediction failed.";
         }
     }
+
+
 }
 
